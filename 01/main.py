@@ -24,33 +24,34 @@ def parse_input(input_filepath: str) -> list[int]:
 
 
 def simulate_rotations(rotations_list: list[int]) -> list[int]:
+    ending_positions = []
     current_position = 50
-    ending_positions: list[int] = []
+    zero_count = 0
     full_rotations = 0
 
     debug(f"\n\nROTATIONS LIST: {rotations_list}\n\n")
 
     for rotation in rotations_list:
         previous_position = current_position
-        if rotation < 0:
-            temp_rotation = abs(rotation) % 100
-            current_position -= temp_rotation
-        else:
-            current_position += rotation % 100
+        current_position += rotation - (int(rotation / 100) * 100)
+
+        full_rotations += int(abs(rotation) / 100)
+
+        if (current_position < 0 and previous_position != 0) or (
+            current_position > 99 and current_position != 100
+        ):
+            full_rotations += 1
+
         if current_position < 0:
             current_position += 100
-            if previous_position != 0:
-                full_rotations += 1
         elif current_position > 99:
             current_position -= 100
-            if current_position != 0:
-                full_rotations += 1
-        full_rotations += int(abs(rotation) / 100)
+        if current_position == 0:
+            zero_count += 1
+
         ending_positions.append(current_position)
 
     debug(f"\n\nENDING POSITIONS: {ending_positions}\n\n")
-
-    zero_count = ending_positions.count(0)
 
     print(f"Simulated ending positions at zero: {zero_count}")
 
