@@ -23,7 +23,7 @@ def parse_input(input_filepath: str) -> list[int]:
     return rotations_list
 
 
-def simulate_rotations(rotations_list: list[int]) -> list[int]:
+def simulate_rotations(rotations_list: list[int]) -> int:
     ending_positions = []
     current_position = 50
     zero_count = 0
