@@ -37,26 +37,46 @@ def is_accessessible(grid: list[str], row: int, col: int) -> bool:
             ]
             if grid[row + x_offset][col + y_offset] == "@":
                 count += 1
-    debug(f"ADJACENT SPOTS FOR {row}, {col}: {adjacent_spots}")
-    return count < 4
+    return count < 5
 
 
-def get_accessible_paper_rolls(grid: list[str]) -> int:
-    count = 0
+def get_accessible_paper_rolls(grid: list[str]) -> list[tuple[int, int, str]]:
+    accessible_paper_rolls: list[tuple[int, int, str]] = []
     for row in range(len(grid)):
-        debug(f"CURRENT ROW: {grid[row]}")
         for col in range(len(grid[row])):
-            debug(f"CURRENT VALUE: {grid[row][col]}")
             if is_accessessible(grid, row, col):
-                count += 1
-    return count
+                accessible_paper_rolls.append((row, col, grid[row][col]))
+    return accessible_paper_rolls
+
+
+def remove_accessible_paper_rolls(
+    current_grid: list[str], paper_rolls: list[tuple[int, int, str]]
+) -> list[str]:
+    for paper_roll in paper_rolls:
+        current_grid[paper_roll[0]] = (
+            current_grid[paper_roll[0]][: paper_roll[1]]
+            + "x"
+            + current_grid[paper_roll[0]][(paper_roll[1] + 1):]
+        )
+    debug("GRID AFTER REMOVALS:")
+    for row in current_grid:
+        debug(f"{row}")
+    return current_grid
 
 
 def main() -> None:
-    input_filepath = "input/grid.txt"
+    input_filepath = "input/test_grid.txt"
     input_grid = parse_input(input_filepath)
     paper_rolls = get_accessible_paper_rolls(input_grid)
-    print(f"Paper rolls accessible by the forklift: {paper_rolls}")
+    count = len([x[2] for x in paper_rolls])
+    print(f"Paper rolls initially accessible by the forklift: {count}")
+    current_grid = input_grid
+    remove_accessible_paper_rolls(current_grid, paper_rolls)
+    while len(paper_rolls) > 0:
+        paper_rolls = get_accessible_paper_rolls(current_grid)
+        count += len([x[2] for x in paper_rolls])
+        current_grid = remove_accessible_paper_rolls(current_grid, paper_rolls)
+    print(f"Total paper rolls accessible by the forklift: {count}")
     return
 
 
