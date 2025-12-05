@@ -66,7 +66,6 @@ def main() -> None:
     available_fresh_ids = find_available_fresh_ids(
         input_fresh_ranges, input_available_ids
     )
-    debug(f"AVAILABLE FRESH IDS: {available_fresh_ids}")
     print(f"There are {available_fresh_ids} available fresh ingedients.")
     condensed_id_ranges = condense_id_ranges(input_fresh_ranges)
     debug(f"CONDENSESD RANGES: {condensed_id_ranges}")
