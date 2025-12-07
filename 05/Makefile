@@ -5,13 +5,13 @@ CXX = g++
 CXXFLAGS = -Wall -g
 
 # Target executable
-TARGET = main
+TARGET = ./main
 
 # For deleting the target
-TARGET_DEL = main
+TARGET_DEL = ./main
 
 # Source files
-SRCS = src/main.cpp src/produce_database.cpp src/read_input.cpp
+SRCS = src/main.cpp src/produce_database.cpp src/read_input.cpp src/merge_sort.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)
@@ -33,4 +33,4 @@ run: $(TARGET)
 
 # Clean rule to remove generated files
 clean:
-	del $(TARGET_DEL) $(OBJS)
+	rm $(TARGET_DEL) $(OBJS)

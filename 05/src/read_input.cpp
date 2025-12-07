@@ -1,22 +1,30 @@
 #include "read_input.h"
-#include <fstream>
-#include <iostream>
-#include <vector>
-#include <string>
-#include "produce_database.h"
 
 using namespace std;
 
-produce_database read_input_from_file(string filepath)
+tuple<vector<string>, vector<string>> read_input_from_file(string filepath)
 {
-    produce_database produce_db;
+    vector<string> ranges;
+    vector<string> ids;
     ifstream input_file(filepath);
     string input_buffer = " ";
-    while (input_buffer != "")
+    bool is_after_ranges = false;
+    while (getline(input_file, input_buffer))
     {
-        getline(input_file, input_buffer);
-        produce_db.add_fresh_range(input_buffer);
+        if (input_buffer == "")
+        {
+            is_after_ranges = true;
+            continue;
+        }
+        if (is_after_ranges)
+        {
+            ids.push_back(input_buffer);
+            continue;
+        }
+        ranges.push_back(input_buffer);
     }
     input_file.close();
-    return produce_db;
+
+    tuple<vector<string>, vector<string>> output(ranges, ids);
+    return output;
 }
