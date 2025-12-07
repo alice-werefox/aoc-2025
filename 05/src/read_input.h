@@ -6,8 +6,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <tuple>
 #include "produce_database.h"
 
-produce_database read_input_from_file(std::string filepath);
+std::tuple<std::vector<std::string>, std::vector<std::string>> read_input_from_file(std::string filepath);
 
 #endif
