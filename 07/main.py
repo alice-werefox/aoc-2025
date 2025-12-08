@@ -14,25 +14,19 @@ def parse_input(input_filepath: str) -> list[str]:
 
 
 def find_split_count_and_timelines(grid: list[str]) -> tuple[int, int]:
-    beam_sets: set[int] = set([grid[0].find("S")])
     beam_dict: dict = {grid[0].find("S"): 1}
-    split_count = 0
+    split_count: int = 0
     for row in range(len(grid[1:])):
         splitters: set[int] = set([i.start(0) for i in finditer("\\^", grid[row])])
         if not splitters:
             debug(
-                f"{"".join(list[str](map(lambda x: "|" if x in beam_sets else ("^" if x in splitters else "."), range(len(grid)))))}"
+                f"{"".join(list[str](map(lambda x: "|" if (x in beam_dict.keys() and beam_dict[x] != 0) else ("^" if x in splitters else "."), range(len(grid)))))}"
             )
             continue
-        intersections = beam_sets.intersection(splitters)
-        differences = beam_sets.difference(splitters)
+        intersections = set(
+            [x for x in beam_dict.keys() if beam_dict[x] != 0]
+        ).intersection(splitters)
         split_count += len(intersections)
-        beam_sets = (
-            set([x - 1 for x in intersections if x > 0])
-            .union([x + 1 for x in intersections if x < len(grid) - 2])
-            .union(differences)
-            .difference(splitters)
-        )
         for i in intersections:
             temp_beams = beam_dict[i]
             beam_dict[i] = 0
@@ -45,7 +39,7 @@ def find_split_count_and_timelines(grid: list[str]) -> tuple[int, int]:
             else:
                 beam_dict[i + 1] = temp_beams
         debug(
-            f"{"".join(list[str](map(lambda x: "|" if x in beam_sets else ("^" if x in splitters else "."), range(len(grid)))))}"
+            f"{"".join(list[str](map(lambda x: "|" if (x in beam_dict.keys() and beam_dict[x]) else ("^" if x in splitters else "."), range(len(grid)))))}"
         )
     return (split_count, sum(beam_dict.values()))
 
