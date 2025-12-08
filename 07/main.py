@@ -13,36 +13,49 @@ def parse_input(input_filepath: str) -> list[str]:
     return [s.strip() for s in input_data]
 
 
-def find_split_count(grid: list[str]) -> int:
-    beams: set[int] = set([grid[0].find("S")])
+def find_split_count_and_timelines(grid: list[str]) -> tuple[int, int]:
+    beam_sets: set[int] = set([grid[0].find("S")])
+    beam_dict: dict = {grid[0].find("S"): 1}
     split_count = 0
-    for row in grid[1:]:
-        splitters: set[int] = set([i.start(0) for i in finditer("\\^", row)])
+    for row in range(len(grid[1:])):
+        splitters: set[int] = set([i.start(0) for i in finditer("\\^", grid[row])])
         if not splitters:
             debug(
-                f"{"".join(list[str](map(lambda x: "|" if x in beams else ("^" if x in splitters else "."), range(len(grid)))))}"
+                f"{"".join(list[str](map(lambda x: "|" if x in beam_sets else ("^" if x in splitters else "."), range(len(grid)))))}"
             )
             continue
-        intersections = beams.intersection(splitters)
-        differences = beams.difference(splitters)
+        intersections = beam_sets.intersection(splitters)
+        differences = beam_sets.difference(splitters)
         split_count += len(intersections)
-        beams = (
+        beam_sets = (
             set([x - 1 for x in intersections if x > 0])
             .union([x + 1 for x in intersections if x < len(grid) - 2])
             .union(differences)
             .difference(splitters)
         )
+        for i in intersections:
+            temp_beams = beam_dict[i]
+            beam_dict[i] = 0
+            if (i - 1) in beam_dict.keys():
+                beam_dict[i - 1] += temp_beams
+            else:
+                beam_dict[i - 1] = temp_beams
+            if (i + 1) in beam_dict.keys():
+                beam_dict[i + 1] += temp_beams
+            else:
+                beam_dict[i + 1] = temp_beams
         debug(
-            f"{"".join(list[str](map(lambda x: "|" if x in beams else ("^" if x in splitters else "."), range(len(grid)))))}"
+            f"{"".join(list[str](map(lambda x: "|" if x in beam_sets else ("^" if x in splitters else "."), range(len(grid)))))}"
         )
-    return split_count
+    return (split_count, sum(beam_dict.values()))
 
 
 def main() -> None:
     input_filepath = "input/grid.txt"
-    input_grid = parse_input(input_filepath)
-    split_count = find_split_count(input_grid)
+    grid = parse_input(input_filepath)
+    split_count, timelines = find_split_count_and_timelines(grid)
     print(f"The beam splits {split_count} times.")
+    print(f"There are {timelines} possible beam timelines.")
     return
 
 
