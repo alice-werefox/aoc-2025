@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python3
 
 from logging import debug, DEBUG, basicConfig
 from sys import argv
@@ -65,7 +65,7 @@ def remove_accessible_paper_rolls(
 
 
 def main() -> None:
-    input_filepath = "input/test_grid.txt"
+    input_filepath = "input/grid.txt"
     input_grid = parse_input(input_filepath)
     paper_rolls = get_accessible_paper_rolls(input_grid)
     count = len([x[2] for x in paper_rolls])

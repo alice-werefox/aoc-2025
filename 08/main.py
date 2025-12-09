@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python3
 
 from logging import debug, DEBUG, basicConfig
 from sys import argv
@@ -84,7 +84,9 @@ def main() -> None:
     debug(f"DISTANCES BETWEEN BOXES: {distances}")
     circuits_after_n, final_distance = create_circuits(distances, len(junction_boxes))
     debug(f"CIRCUITS CREATED AFTER 1000 ITERATIONS: {circuits_after_n}")
-    debug(f"FINAL DISTANCE EXAMINED: {final_distance[0]} | {junction_boxes[final_distance[1]]} | {junction_boxes[final_distance[2]]}")
+    debug(
+        f"FINAL DISTANCE EXAMINED: {final_distance[0]} | {junction_boxes[final_distance[1]]} | {junction_boxes[final_distance[2]]}"
+    )
     circuits_after_n.sort(reverse=True)
     product_of_n_largest_circuits = (
         circuits_after_n[0] * circuits_after_n[1] * circuits_after_n[2]

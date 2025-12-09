@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python3
 
 from logging import debug, DEBUG, basicConfig
 from sys import argv
