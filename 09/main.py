@@ -2,8 +2,7 @@
 
 from logging import debug, DEBUG, basicConfig
 from sys import argv
-
-# from math import dist
+from shapely.geometry.polygon import Polygon
 
 
 def parse_input(input_filepath: str) -> list[tuple[int, int]]:
@@ -39,79 +38,101 @@ def find_areas(
     return areas
 
 
-# 4616586187
+# def find_within_bounds(
+#     rectangles: list[tuple[int, int, int]], vertices: list[tuple[int, int]]
+# ) -> tuple[int, int, int]:
+#     for r in rectangles:
+#         outside_bounds = False
+#         min_x = min(vertices[r[1]][0], vertices[r[2]][0])
+#         max_x = max(vertices[r[1]][0], vertices[r[2]][0])
+#         min_y = min(vertices[r[1]][1], vertices[r[2]][1])
+#         max_y = max(vertices[r[1]][1], vertices[r[2]][1])
+#         debug(f"{r[0]}, {vertices[r[1]]}, {vertices[r[2]]}")
+#         left_intersects = -1
+#         right_intersects = -1
+#         down_intersects = -1
+#         up_intersects = -1
+#         for v in range(len(vertices[1:])):
+#             is_horizontal_line = vertices[v - 1][1] == vertices[v][1]
+#             is_vertical_line = vertices[v - 1][0] == vertices[v][0]
+#             is_in_y_bounds = vertices[v][1] > min_y and vertices[v][1] < max_y
+#             is_in_x_bounds = vertices[v][0] > min_x and vertices[v][0] < max_x
+#             line_intersects_left = (
+#                 min(vertices[v - 1][0], vertices[v][0]) < min_x
+#                 and max(vertices[v - 1][0], vertices[v][0]) > min_x
+#             )
+#             line_intersects_right = (
+#                 min(vertices[v - 1][0], vertices[v][0]) < max_x
+#                 and max(vertices[v - 1][0], vertices[v][0]) > max_x
+#             )
+#             line_intersects_down = (
+#                 min(vertices[v - 1][1], vertices[v][1]) < min_y
+#                 and max(vertices[v - 1][1], vertices[v][1]) > min_y
+#             )
+#             line_intersects_up = (
+#                 min(vertices[v - 1][1], vertices[v][1]) < max_y
+#                 and max(vertices[v - 1][1], vertices[v][1]) > max_y
+#             )
+
+#             if is_horizontal_line:
+#                 if line_intersects_left or line_intersects_right:
+#                     if is_in_y_bounds:
+#                         debug(f"{vertices[v-1]}, {vertices[v]}")
+#                         outside_bounds = True
+#                         break
+#                 if line_intersects_left:
+#                     left_intersects += 1
+#                 if line_intersects_right:
+#                     right_intersects += 1
+
+#             if is_vertical_line:
+#                 if line_intersects_down or line_intersects_up:
+#                     if is_in_x_bounds:
+#                         debug(f"{vertices[v-1]}, {vertices[v]}")
+#                         outside_bounds = True
+#                         break
+#                 if line_intersects_down:
+#                     down_intersects += 1
+#                 if line_intersects_up:
+#                     up_intersects += 1
+
+#         if (
+#             outside_bounds
+#             or (
+#                 left_intersects < 0
+#                 or right_intersects < 0
+#                 or down_intersects < 0
+#                 or up_intersects < 0
+#             )
+#             or (
+#                 left_intersects % 2 == 1
+#                 or right_intersects % 2 == 1
+#                 or down_intersects % 2 == 1
+#                 or up_intersects % 2 == 1
+#             )
+#         ):
+#             continue
+
+#         return r
+
+#     return (0, 0, 0)
+
+
 def find_within_bounds(
     rectangles: list[tuple[int, int, int]], vertices: list[tuple[int, int]]
 ) -> tuple[int, int, int]:
+    tile_shape = Polygon(vertices)
     for r in rectangles:
-        contains_vertices = False
-        min_x = min(vertices[r[1]][0], vertices[r[2]][0])
-        min_y = min(vertices[r[1]][1], vertices[r[2]][1])
-        max_x = max(vertices[r[1]][0], vertices[r[2]][0])
-        max_y = max(vertices[r[1]][1], vertices[r[2]][1])
-        debug(f"{r[0]}, {vertices[r[1]]}, {vertices[r[2]]}")
-        in_x_bounds = vertices[0][0] > min_x and vertices[0][0] < max_x
-        in_y_bounds = vertices[0][1] > min_y and vertices[0][1] < max_y
-        if in_x_bounds and in_y_bounds:
-            debug(f"{vertices[0]}")
-            continue
-        scanline_x_max = []
-        scanline_x_min = []
-        scanline_y_max = []
-        scanline_y_min = []
-        for v in range(len(vertices[1:])):
-            in_x_bounds = vertices[v][0] > min_x and vertices[v][0] < max_x
-            in_y_bounds = vertices[v][1] > min_y and vertices[v][1] < max_y
-            if in_x_bounds and in_y_bounds:
-                debug(f"{v}")
-                contains_vertices = True
-                break
-            if (
-                max(vertices[v][1], vertices[v - 1][1]) >= max_y
-                and min(vertices[v][1], vertices[v - 1][1]) <= max_y
-            ):
-                scanline_y_max.append(vertices[v][0])
-            if (
-                max(vertices[v][1], vertices[v - 1][1]) >= min_y
-                and min(vertices[v][1], vertices[v - 1][1]) <= min_y
-            ):
-                scanline_y_min.append(vertices[v][0])
-            if (
-                max(vertices[v][0], vertices[v - 1][0]) >= max_x
-                and min(vertices[v][0], vertices[v - 1][0]) <= max_x
-            ):
-                scanline_x_max.append(vertices[v][1])
-            if (
-                max(vertices[v][0], vertices[v - 1][0]) >= min_x
-                and min(vertices[v][0], vertices[v - 1][0]) <= min_x
-            ):
-                scanline_x_min.append(vertices[v][1])
-        if contains_vertices:
-            continue
-        scanline_x_min = [x for x in set(scanline_x_min)]
-        scanline_x_max = [x for x in set(scanline_x_max)]
-        scanline_y_min = [x for x in set(scanline_y_min)]
-        scanline_y_max = [x for x in set(scanline_y_max)]
-        scanline_x_min.sort()
-        scanline_x_max.sort()
-        scanline_y_min.sort()
-        scanline_y_max.sort()
-        debug(
-            f"\n{scanline_x_min}\n{scanline_x_max}\n{scanline_y_min}\n{scanline_y_max}"
+        area = Polygon(
+            [
+                vertices[r[1]],
+                (vertices[r[1]][0], vertices[r[2]][1]),
+                vertices[r[2]],
+                (vertices[r[2]][0], vertices[r[1]][1]),
+            ]
         )
-        for x in range(len(scanline_y_min)):
-            if scanline_y_min[x] > max_x and x % 2 == 0:
-                break
-        for x in range(len(scanline_y_max)):
-            if scanline_y_max[x] > max_x and x % 2 == 0:
-                break
-        for y in range(len(scanline_x_min)):
-            if scanline_x_min[y] > max_y and y % 2 == 0:
-                break
-        for y in range(len(scanline_x_max)):
-            if scanline_x_max[y] > max_y and y % 2 == 0:
-                break
-        return r
+        if tile_shape.contains(area):
+            return r
     return (0, 0, 0)
 
 
